@@ -12,6 +12,7 @@ win.title("Spending Tracker")
 win.geometry(f"{WIDTH}x{HEIGHT}")
 
 ######################################################
+
 def home_pressed():
     print("Home")
 
@@ -36,8 +37,8 @@ sidebar.grid_propagate(False)
 
 sidebar_buttons_list = [
     CTkButton(master=sidebar, text="Home",
-                        command=home_pressed, font=DEFAULT_FONT,
-                        fg_color="#2b2b2b")
+                command=home_pressed, font=DEFAULT_FONT,
+                fg_color="#2b2b2b")
 ]
 
 sidebar_buttons = ButtonGroup()
