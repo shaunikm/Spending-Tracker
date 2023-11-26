@@ -17,20 +17,21 @@ win.geometry(f"{WIDTH}x{HEIGHT}")
 
 ######################################################
 
+# display home screen
 def show_home():
     home_screen.tkraise()
     home_title.configure(text=f"Good {get_time_of_day()}!")
     spending_title.configure(text="$%.2f / $%.2f spent this week" % (weekly_spending, weekly_budget))
-    # spending_progress.set(weekly_spending/weekly_budget)
     move_spending_progress()
-    
+
+# move spending progress bar smoothly
 def move_spending_progress():
-    # increment the progress bar
     for i in range(int(weekly_spending/weekly_budget*100)):
         spending_progress.set(i/100+0.01)
         win.update()
         sleep(0.01)
-    
+   
+# display wallet screen 
 def show_wallet():
     wallet_screen.tkraise()
     
@@ -64,6 +65,9 @@ SUBTEXT = CTkFont(
                 family="Futura",
                 size=20
                 )
+
+# set fonts for custom classes in ctk_custom.py             
+set_fonts()
 
 #######################################################
 ##                      Sidebar                      ##
@@ -106,23 +110,30 @@ for _ in sidebar_buttons_list:
 home_screen = CTkFrame(master=win, width=WIDTH//5*4+25, height=HEIGHT-50)
 home_screen.grid(row=0, column=5, sticky=(NSEW))
 
+# group of home screen elements
+home_group = Page(STARTING_UPPER_INDENT, 0.05, home_screen)
+
 # disable scaling based on widgets in sidebar
 home_screen.grid_propagate(False)
 
 # greeting
 home_title = CTkLabel(master=home_screen,
                       font=TITLE, text=f"Good {get_time_of_day()}!")
-home_title.place(relx=0.05, rely=0.12, anchor="w")
 
 # title of progress bar
 spending_title = CTkLabel(master=home_screen, font=SUBTEXT,
                           text="$%.2f / $%.2f spent this week" % (weekly_spending, weekly_budget))
-spending_title.place(relx=0.05, rely=0.25, anchor="w")
 
 # progress bar
 spending_progress = CTkProgressBar(master=home_screen, orientation="horizontal",
                                    progress_color="#7e98ba", width=400, height=20)
-spending_progress.place(relx=0.05, rely=0.35, anchor="w")
+
+# add transactions
+add_recent_transactions = CTkButton(master=home_screen, font=SUBTEXT,
+                                    image=)
+
+Image.Image
+home_group.add_group([home_title, spending_title, spending_progress])
 
 ######################################################
 ##                  MyWallet Frame                  ##
@@ -130,19 +141,31 @@ spending_progress.place(relx=0.05, rely=0.35, anchor="w")
 
 # frame
 wallet_screen = CTkFrame(master=win, width=WIDTH//5*4, height=HEIGHT)
-wallet_screen.grid_propagate(False)
 wallet_screen.grid(row=0, column=5, sticky=(NSEW))
+
+# group of wallet screen elements
+wallet_group = Page(STARTING_UPPER_INDENT, 0.05, wallet_screen)
+
+# disable scaling based on widgets in sidebar
+wallet_screen.grid_propagate(False)
 
 wallet_title = CTkLabel(master=wallet_screen,
                       font=TITLE, text="Good Day!")
-wallet_title.place(relx=0.05, rely=0.12, anchor="w")
 
 
 
+wallet_group.add_group([wallet_title])
 
 
+#######################################################
+##                Displaying Elements                ##
+#######################################################
 
+# place all elements in different groups
+home_group.place_all()
+wallet_group.place_all()
 
-
+# display home as the first screen
 show_home()
+
 win.mainloop()
