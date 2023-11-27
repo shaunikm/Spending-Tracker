@@ -6,57 +6,15 @@ from datetime import datetime
 from os import getcwd, chdir
 from os.path import join, dirname
 from time import sleep
-
-# appearance settings
 set_appearance_mode(DEFAULT_APPEARANCE)
 set_default_color_theme(DEFAULT_COLOR_THEME)
-
-# setup window info
-win = CTk()
-win.resizable(False, False)
-win.title("Spending Tracker")
-win.geometry(f"{WIDTH}x{HEIGHT}")
-
-######################################################
-
-# display home screen
-def show_home():
-    home_screen.tkraise()
-    home_title.configure(text=f"Good {get_time_of_day()}!")
-    spending_progress_bar_title.configure(text="$%.2f / $%.2f spent this week" % (weekly_spending, weekly_budget))
-    move_spending_progress()
-
-# move spending progress bar smoothly
-def move_spending_progress():
-    for i in range(int(weekly_spending/weekly_budget*100)):
-        spending_progress_bar.set(i/100+0.01)
-        win.update()
-        sleep(0.01)
-   
-# display wallet screen 
-def show_wallet():
-    wallet_screen.tkraise()
-    
-# display spending screen 
-def show_spending():
-    spending_screen.tkraise()
-    
-def get_time_of_day():
-    time = datetime.now().hour
-    if time < 12:
-        return "Morning"
-    elif time < 16:
-        return "Afternoon"
-    elif time < 19:
-        return "Evening"
-    else:
-        return "Night"
 
 ############################################################
 ##                      Text Options                      ##
 ############################################################
 
 # text options
+
 OPTION = CTkFont(
                 family="Futura",
                 size=25
@@ -65,138 +23,213 @@ OPTION = CTkFont(
 TITLE = CTkFont(
                 family="Futura",
                 size=30
-                )
+                    )
 
 SUBTEXT = CTkFont(
                 family="Futura",
                 size=20
-                )
+                    )
 
 # set fonts for custom classes in ctk_custom.py             
-set_fonts()
-
-###########################################################
-##                      Load Images                      ##
-###########################################################
-
-chdir(dirname(__file__))
-
-# home icon
-home_ico = CTkImage(dark_image=open_image(join(getcwd(), "img/home.png")))
 
 #######################################################
 ##                      Sidebar                      ##
 #######################################################
+class sidebar_frame(CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
 
-# sidebar dimensions
-sidebar = CTkFrame(win, width=WIDTH//5-25, height=HEIGHT//5*4, fg_color="#2b2b2b")
-sidebar.grid(row=0, column=0, sticky=(SE))
+        #load images
+        chdir(dirname(__file__))
+        # home icon
+        self.home_ico = CTkImage(dark_image=open_image(join(getcwd(), "img/home.png")))
 
-# disable scaling based on widgets in sidebar
-sidebar.grid_propagate(False)
+        # sidebar dimensions
+        self.sidebar = CTkFrame(window, width=WIDTH//5-25, height=HEIGHT//5*4, fg_color="#2b2b2b")
+        self.sidebar.grid(row=0, column=0, sticky=(SE))
 
-sidebar_buttons_list = [
-    # home button
-    (CTkButton(master=win, text="Home", image=home_ico,
-                command=show_home, font=OPTION,
-                fg_color="#201c1c"), (0.015, 0.11, "w")),
-    
-    # MyWallet button
-    (CTkButton(master=sidebar, text="MyWallet",
-              font=OPTION, command=show_wallet,
-              fg_color="#2b2b2b"), (0.5, 0.11, CENTER)),
-    
-    # spending button
-    (CTkButton(master=sidebar, text="Spending",
-              font=OPTION, command=show_spending,
-              fg_color="#2b2b2b"), (0.5, 0.22, CENTER))
-]
+        # disable scaling based on widgets in sidebar
+        self.sidebar.grid_propagate(False)
 
-sidebar_buttons = ButtonGroup()
-for _ in sidebar_buttons_list:
-    _[0].place(relx=_[1][0], rely=_[1][1], anchor=_[1][2])
-    sidebar_buttons.add(_[0])
+        self.sidebar_buttons_list = [
+            # home button
+            (CTkButton(window, text="Home", image=self.home_ico,
+                        command=home_frame.show_home, font=OPTION,
+                        fg_color="#201c1c"), (0.015, 0.11, "w")),
+            
+            # MyWallet button
+            (CTkButton(self, text="MyWallet",
+                    font=OPTION, command=wallet_frame.show_wallet,
+                    fg_color="#2b2b2b"), (0.5, 0.11, CENTER)),
+            
+            # spending button
+            (CTkButton(self, text="Spending",
+                    font=OPTION, command=spending_frame.show_spending,
+                    fg_color="#2b2b2b"), (0.5, 0.22, CENTER))
+        ]
+
+        self.sidebar_buttons = ButtonGroup()
+        for _ in self.sidebar_buttons_list:
+            _[0].place(relx=_[1][0], rely=_[1][1], anchor=_[1][2])
+            self.sidebar_buttons.add(_[0])
 
 ######################################################
 ##                    Home Frame                    ##
 ######################################################
 
-# frame
-home_screen = CTkFrame(master=win, width=WIDTH//5*4+25, height=HEIGHT-50)
-home_screen.grid(row=0, column=5, sticky=(NSEW))
+class home_frame(CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
 
-# group of home screen elements
-home_group = Page(STARTING_UPPER_INDENT, 0.05, home_screen)
+        # frame
+        self.home_screen = CTkFrame(master=master, width=WIDTH//5*4+25, height=HEIGHT-50)
+        self.home_screen.grid(row=0, column=5, sticky=(NSEW))
 
-# disable scaling based on widgets in sidebar
-home_screen.grid_propagate(False)
+        # group of home screen elements
+        self.home_group = Page(STARTING_UPPER_INDENT, 0.05, self)
 
-# greeting
-home_title = CTkLabel(master=home_screen,
-                      font=TITLE, text=f"Good {get_time_of_day()}!")
+        # disable scaling based on widgets in sidebar
+        self.grid_propagate(False)
 
-# title of progress bar
-spending_progress_bar_title = CTkLabel(master=home_screen, font=SUBTEXT,
-                          text="$%.2f / $%.2f spent this week" % (weekly_spending, weekly_budget))
+        # greeting
+        self.home_title = CTkLabel(self,
+                                   font=TITLE, 
+                                   text=f"Good {self.get_time_of_day()}!")
 
-# progress bar
-spending_progress_bar = CTkProgressBar(master=home_screen, orientation="horizontal",
-                                   progress_color="#FFFFFF", width=400, height=20)
+        # title of progress bar
+        self.spending_progress_bar_title = CTkLabel(self, font=SUBTEXT,
+                                                    text="$%.2f / $%.2f spent this week" % (weekly_spending, weekly_budget))
 
-# add transactions
-add_recent_transactions = CTkButton(master=home_screen, font=OPTION, text="Add recent transactions",
-                                    command=show_spending, fg_color="#2b2b2b")
+        # progress bar
+        self.spending_progress_bar = CTkProgressBar(self, orientation="horizontal",
+                                        progress_color="#FFFFFF", width=400, height=20)
 
-home_group.add_group([home_title, spending_progress_bar_title, spending_progress_bar, add_recent_transactions])
+        # add transactions
+        self.add_recent_transactions = CTkButton(self, font=OPTION, text="Add recent transactions",
+                                            command=self.show_spending, fg_color="#2b2b2b")
+        
+        self.home_group.add_group([self.home_title, self.spending_progress_bar_title, self.spending_progress_bar, self.add_recent_transactions])
+    
+    def get_time_of_day(self):
+            time = datetime.now().hour
+            if time < 12:
+                return "Morning"
+            elif time < 16:
+                return "Afternoon"
+            elif time < 19:
+                return "Evening"
+            else:
+                return "Night"
+                 
+    # display spending screen 
+    def show_spending(self):
+        self.spending_screen.tkraise()
 
 ######################################################
 ##                  MyWallet Frame                  ##
 ######################################################
 
-# frame
-wallet_screen = CTkFrame(master=win, width=WIDTH//5*4, height=HEIGHT)
-wallet_screen.grid(row=0, column=5, sticky=(NSEW))
+class wallet_frame(CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+        
+        # frame
+        self.wallet_screen = CTkFrame(window, width=WIDTH//5*4, height=HEIGHT)
+        self.wallet_screen.grid(row=0, column=5, sticky=(NSEW))
 
-# group of wallet screen elements
-wallet_group = Page(STARTING_UPPER_INDENT, 0.05, wallet_screen)
+        # group of wallet screen elements
+        self.wallet_group = Page(STARTING_UPPER_INDENT, 0.05, self)
 
-# disable scaling based on widgets in sidebar
-wallet_screen.grid_propagate(False)
+        # disable scaling based on widgets in sidebar
+        self.wallet_screen.grid_propagate(False)
 
-wallet_title = CTkLabel(master=wallet_screen,
-                      font=TITLE, text="Good Day!")
+        self.wallet_title = CTkLabel(self,
+                            font=TITLE, text="Good Day!")
 
-wallet_group.add_group([wallet_title])
+        self.wallet_group.add_group([self.wallet_title])
+        
 
 ######################################################
 ##                  Spending Frame                  ##
 ######################################################
+class spending_frame(CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+    
+        # frame
+        self.spending_screen = CTkFrame(window, width=WIDTH//5*4, height=HEIGHT)
+        self.spending_screen.grid(row=0, column=5, sticky=(NSEW))
 
-# frame
-spending_screen = CTkFrame(master=win, width=WIDTH//5*4, height=HEIGHT)
-spending_screen.grid(row=0, column=5, sticky=(NSEW))
+        # group of wallet screen elements
+        self.spending_group = Page(STARTING_UPPER_INDENT, 0.05, self)
 
-# group of wallet screen elements
-spending_group = Page(STARTING_UPPER_INDENT, 0.05, wallet_screen)
+        # disable scaling based on widgets in sidebar
+        self.grid_propagate(False)
 
-# disable scaling based on widgets in sidebar
-spending_screen.grid_propagate(False)
+        self.spending_title = CTkLabel(master = self.spending_screen,
+                            font=TITLE, text="Spending")
 
-spending_title = CTkLabel(master=spending_screen,
-                      font=TITLE, text="Spending")
+        self.spending_group.add_group([self.spending_title])
 
-spending_group.add_group([spending_title])
+    # move spending progress bar smoothly
+    def move_spending_progress():
+        for i in range(int(weekly_spending/weekly_budget*100)):
+            spending_frame.spending_progress_bar.set(i/100+0.01)
+            window.update()
+            sleep(0.01)
+
 
 #######################################################
 ##                Displaying Elements                ##
 #######################################################
 
-# place all elements in different groups
-home_group.place_all()
-wallet_group.place_all()
-spending_group.place_all()
+class window(CTk):
+    def __init__(self):
+        super().__init__()
 
-# display home as the first screen
-show_home()
+        # setup window info
+        self.resizable(False, False)
+        self.title("Spending Tracker")
+        self.geometry(f"{WIDTH}x{HEIGHT}")
+
+        # display home screen
+        def show_home():
+            home_frame.home_screen.tkraise()
+            home_frame.home_title.configure(text=f"Good {home_frame.get_time_of_day()}!")
+            home_frame.spending_progress_bar_title.configure(text="$%.2f / $%.2f spent this week" % (weekly_spending, weekly_budget))
+            spending_frame.move_spending_progress()
+
+        
+        # display wallet screen 
+        def show_wallet():
+            wallet_frame.wallet_screen.tkraise()
+
+        # place all elements in different groups
+        hf = home_frame(self)
+        hf.home_group.place_all()
+        wallet_frame.wallet_group.place_all()
+        spending_frame.spending_group.place_all()
+
+        # display home as the first screen
+        show_home()
+    
+win = window()
+
+
+OPTION = CTkFont(
+                family="Futura",
+                size=25
+                )
+
+TITLE = CTkFont(
+                family="Futura",
+                size=30
+                    )
+
+SUBTEXT = CTkFont(
+                family="Futura",
+                size=20
+                    )
+set_fonts()
 
 win.mainloop()
