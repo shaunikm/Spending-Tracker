@@ -6,35 +6,9 @@ from datetime import datetime
 from os import getcwd, chdir
 from os.path import join, dirname
 from time import sleep
-set_appearance_mode(DEFAULT_APPEARANCE)
-set_default_color_theme(DEFAULT_COLOR_THEME)
+#set_appearance_mode(DEFAULT_APPEARANCE)
+#set_default_color_theme(DEFAULT_COLOR_THEME)
 
-############################################################
-##                      Text Options                      ##
-############################################################
-
-# text options
-
-OPTION = CTkFont(
-                family="Futura",
-                size=25
-                )
-
-TITLE = CTkFont(
-                family="Futura",
-                size=30
-                    )
-
-SUBTEXT = CTkFont(
-                family="Futura",
-                size=20
-                    )
-
-# set fonts for custom classes in ctk_custom.py             
-
-#######################################################
-##                      Sidebar                      ##
-#######################################################
 class sidebar_frame(CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -54,17 +28,17 @@ class sidebar_frame(CTkFrame):
         self.sidebar_buttons_list = [
             # home button
             (CTkButton(window, text="Home", image=self.home_ico,
-                        command=home_frame.show_home, font=OPTION,
+                        command=home_frame.show_home,
                         fg_color="#201c1c"), (0.015, 0.11, "w")),
             
             # MyWallet button
             (CTkButton(self, text="MyWallet",
-                    font=OPTION, command=wallet_frame.show_wallet,
+                        command=wallet_frame.show_wallet,
                     fg_color="#2b2b2b"), (0.5, 0.11, CENTER)),
             
             # spending button
             (CTkButton(self, text="Spending",
-                    font=OPTION, command=spending_frame.show_spending,
+                    command=spending_frame.show_spending,
                     fg_color="#2b2b2b"), (0.5, 0.22, CENTER))
         ]
 
@@ -72,10 +46,6 @@ class sidebar_frame(CTkFrame):
         for _ in self.sidebar_buttons_list:
             _[0].place(relx=_[1][0], rely=_[1][1], anchor=_[1][2])
             self.sidebar_buttons.add(_[0])
-
-######################################################
-##                    Home Frame                    ##
-######################################################
 
 class home_frame(CTkFrame):
     def __init__(self, master):
@@ -93,11 +63,10 @@ class home_frame(CTkFrame):
 
         # greeting
         self.home_title = CTkLabel(self,
-                                   font=TITLE, 
                                    text=f"Good {self.get_time_of_day()}!")
 
         # title of progress bar
-        self.spending_progress_bar_title = CTkLabel(self, font=SUBTEXT,
+        self.spending_progress_bar_title = CTkLabel(self,
                                                     text="$%.2f / $%.2f spent this week" % (weekly_spending, weekly_budget))
 
         # progress bar
@@ -105,7 +74,7 @@ class home_frame(CTkFrame):
                                         progress_color="#FFFFFF", width=400, height=20)
 
         # add transactions
-        self.add_recent_transactions = CTkButton(self, font=OPTION, text="Add recent transactions",
+        self.add_recent_transactions = CTkButton(self, text="Add recent transactions",
                                             command=self.show_spending, fg_color="#2b2b2b")
         
         self.home_group.add_group([self.home_title, self.spending_progress_bar_title, self.spending_progress_bar, self.add_recent_transactions])
@@ -125,10 +94,6 @@ class home_frame(CTkFrame):
     def show_spending(self):
         self.spending_screen.tkraise()
 
-######################################################
-##                  MyWallet Frame                  ##
-######################################################
-
 class wallet_frame(CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -144,14 +109,10 @@ class wallet_frame(CTkFrame):
         self.wallet_screen.grid_propagate(False)
 
         self.wallet_title = CTkLabel(self,
-                            font=TITLE, text="Good Day!")
+                            text="Good Day!")
 
         self.wallet_group.add_group([self.wallet_title])
         
-
-######################################################
-##                  Spending Frame                  ##
-######################################################
 class spending_frame(CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -167,7 +128,7 @@ class spending_frame(CTkFrame):
         self.grid_propagate(False)
 
         self.spending_title = CTkLabel(master = self.spending_screen,
-                            font=TITLE, text="Spending")
+                            text="Spending")
 
         self.spending_group.add_group([self.spending_title])
 
@@ -177,11 +138,6 @@ class spending_frame(CTkFrame):
             spending_frame.spending_progress_bar.set(i/100+0.01)
             window.update()
             sleep(0.01)
-
-
-#######################################################
-##                Displaying Elements                ##
-#######################################################
 
 class window(CTk):
     def __init__(self):
@@ -212,10 +168,7 @@ class window(CTk):
 
         # display home as the first screen
         show_home()
-    
-win = window()
-
-
+'''
 OPTION = CTkFont(
                 family="Futura",
                 size=25
@@ -231,5 +184,6 @@ SUBTEXT = CTkFont(
                 size=20
                     )
 set_fonts()
-
+'''
+win = window()
 win.mainloop()
